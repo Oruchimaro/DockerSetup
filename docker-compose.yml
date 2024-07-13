@@ -1,0 +1,40 @@
+version: "3.8"
+
+networks:
+  laravel-network: # create network for container
+    name: laravel-network # give a readable anme
+
+services:
+  php:
+    build:
+      context: ./docker/develop/php
+      dockerfile: php.dockerfile
+    container_name: php #fullname of container after its creation
+    volumes:
+      - ./src:/var/www/html
+    networks: # Add the network to the container
+      - laravel-network
+
+  mysql:
+    image: mysql:latest # build mysql latest version
+    container_name: mysql #fullname of container after its creation
+    environment: # Adding environment variables that container expects
+      MYSQL_DATABASE: laraveldb
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: secrect
+      MYSQL_ROOT_PASSWORD: secrect
+    networks: # Add the network to the container
+      - laravel-network
+
+  nginx:
+    build:
+      context: ./docker/develop/nginx
+      dockerfile: nginx.dockerfile
+    container_name: nginx #fullname of container after its creation
+    ports:
+      - 81:80
+      - 443:443
+    volumes:
+      - ./src:/var/www/html
+    networks: # Add the network to the container
+      - laravel-network
